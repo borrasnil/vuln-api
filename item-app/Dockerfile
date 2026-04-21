@@ -9,4 +9,3 @@ COPY . .
 
 EXPOSE 3001
 CMD ["python", "app.py"]
-CMD ["python", "populate.py"]

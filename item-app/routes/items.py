@@ -1,61 +1,77 @@
 from flask import Blueprint, jsonify, request
+from db import get_db
 from models.item import Item
 
 route = Blueprint('api', __name__, url_prefix='/api')
-items: list[Item] = []
-next_id = 0
 
 @route.get('/items')
 def getItems():
-    if len(items) == 0:
-        return jsonify({'error': 'Items not Found'})
-    return jsonify(items)
+    db = get_db()
+    cur = db.cursor()
 
-@route.get('/item/<int:id>')
-def getItem(id):
-    for item in items:
-        if item.id != id: continue
-        return jsonify(item)
-    return jsonify({'error': 'Item not Found'})
+    cur.execute("SELECT id, name FROM items")
+    rows = cur.fetchall()
+    print(rows)
+
+    if len(rows) == 0:
+        return jsonify({'error': 'Items not Found'})
+    return jsonify([{"id": r["id"], "name": r["name"]} for r in rows])
+
+@route.get('/item')
+def getItem():
+    id = request.args.get('id')
+    db = get_db()
+    cur = db.cursor()
+
+    query = f"SELECT id, name FROM items WHERE id = {id}"
+    cur.execute(query)
+    
+    item = cur.fetchone()
+    if item == None:
+        return jsonify({'error': 'Item not Found'})
+    return jsonify(dict(item))
 
 @route.post('/item')
 def createItem():
-    try:
-        data = request.get_json()
-        name = data["name"]
-        global next_id
+    db = get_db()
+    cur = db.cursor()
 
-        item = Item(id=next_id, name=name)
-        items.append(item)
-        next_id += 1
+    data = request.get_json()
+    name = data["name"]
 
-        return jsonify(item)
-    except Exception as e:
-        return jsonify({'error': str(e)})
+    cur.execute("INSERT INTO items (name) VALUES (?)", (name,))
+    db.commit()
 
-@route.put('/item/<int:id>')
+    return jsonify({'id': cur.lastrowid, "name": name})
+
+@route.put("/item/<int:id>")
 def updateItem(id):
-    try:
-        for item in items:
-            if item.id != id: continue
-            data = request.get_json()
-            name = data["name"]
-            items.remove(item)
-            items.insert(id, Item(id, name))
-            return jsonify(items[id])
-        return jsonify({'error': 'Item not Found'})
-    except Exception as e:
-        return jsonify({'error': str(e)})
+    db = get_db()
+    cur = db.cursor()
 
+    data = request.get_json()
+    name = data["name"]
 
-@route.delete('/item/<int:id>')
+    cur.execute("UPDATE items SET name = ? WHERE id = ?", (name, id))
+    db.commit()
+
+    if cur.rowcount == 0:
+        return jsonify({"error": "Item not found"})
+
+    return jsonify({"id": id, "name": name})
+
+@route.delete("/item/<int:id>")
 def deleteItem(id):
-    for item in items:
-        if item.id != id: continue
-        # items.pop(id)
-        return jsonify(item)
-    return jsonify({'error': 'Item not Found'})
+    db = get_db()
+    cur = db.cursor()
 
+    cur.execute("DELETE FROM items WHERE id = ?", (id,))
+    db.commit()
+
+    if cur.rowcount == 0:
+        return jsonify({"error": "Item not found"})
+
+    return jsonify({"status": "deleted", "id": id})
 
 @route.get('/sensitive_data')
 def sensitive_data():

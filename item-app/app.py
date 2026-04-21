@@ -1,22 +1,19 @@
-from flask import Flask, jsonify, request
+from flask import Flask
+from db import close_db, init_db
 from routes.items import route
-
-API_KEY = "$uP3r_$tR0nG_p4$$w0rd_M0nl4u2026"
 
 app = Flask(__name__);
 
-@app.before_request
-def check_auth():
-    token = request.headers.get("Authorization")
-    if token != f"Bearer {API_KEY}":
-        return jsonify({'error': 'Unauthorized'}), 401
 
 @app.get("/health")
 def health():
     return "ok", 200
 
 app.register_blueprint(route, url_prefix="/api")
+app.teardown_appcontext(close_db)
+
 if __name__ == "__main__":
+    init_db()
     app.run(
         host="0.0.0.0",
         debug=True,
