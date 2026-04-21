@@ -1,17 +1,9 @@
-from flask import Flask, Blueprint, jsonify, request
-from dataclasses import dataclass
+from flask import Blueprint, jsonify, request
+from models.item import Item
 
-next_id = 0
-@dataclass
-class Item:
-    id: int
-    name: str
-
-
-app = Flask(__name__);
 route = Blueprint('api', __name__, url_prefix='/api')
-
 items: list[Item] = []
+next_id = 0
 
 @route.get('/items')
 def getItems():
@@ -72,9 +64,3 @@ def sensitive_data():
         'password': 'password1234'
     })
         
-
-app.register_blueprint(route)
-if __name__ == "__main__":
-    app.run(debug=True, port=3001)
-   
-
