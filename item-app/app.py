@@ -11,10 +11,14 @@ def check_auth():
     if token != f"Bearer {API_KEY}":
         return jsonify({'error': 'Unauthorized'}), 401
 
+@app.get("/health")
+def health():
+    return "ok", 200
+
 app.register_blueprint(route, url_prefix="/api")
 if __name__ == "__main__":
     app.run(
-        host=".0",
+        host="0.0.0.0",
         debug=True,
         port=3001
     )

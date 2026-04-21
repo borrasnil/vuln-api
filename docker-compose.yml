@@ -1,0 +1,15 @@
+services:
+  flask:
+    build: item-app
+    container_name: api
+    command: python app.py
+    ports:
+      - "3001:3001"
+    restart: always
+
+  populate:
+    build: item-app
+    container_name: populate_script
+    command: python populate.py
+    depends_on:
+      - flask
