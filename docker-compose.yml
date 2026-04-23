@@ -1,11 +1,57 @@
+version: '3.8'
+
 services:
-  flask:
-    build: item-app
-    container_name: api
-    command: python app.py
+  postgres:
+    image: postgres:15-alpine
+    container_name: api_lab_db
+    environment:
+      POSTGRES_DB: api_lab
+      POSTGRES_USER: api_user
+      POSTGRES_PASSWORD: api_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "3001:3001"
-    restart: always
+      - "5433:5432"
+    networks:
+      - api-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U api_user -d api_lab"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-    
+  flask-api:
+    build:
+      context: ./api-lab
+      dockerfile: Dockerfile
+    container_name: api_lab_flask
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://api_user:api_pass@postgres:5432/api_lab
+      FLASK_ENV: development
+      SECRET_KEY: dev-secret-key-change-in-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - api-network
 
+  nginx:
+    image: nginx:alpine
+    container_name: api_lab_frontend
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - flask-api
+    networks:
+      - api-network
+
+networks:
+  api-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

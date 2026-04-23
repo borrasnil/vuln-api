@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge {{ id }} - {{ challenge.name }} - API Security Lab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { 'sans': ['Inter', 'sans-serif'], 'mono': ['Fira Code', 'monospace'] },
+          colors: { 
+            'lab': { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .endpoint-btn {
+      transition: all 0.2s;
+    }
+    .endpoint-btn:hover {
+      transform: translateX(4px);
+      box-shadow: 4px 4px 0 theme('colors.lab.600');
+    }
+    pre {
+      font-family: 'Fira Code', monospace;
+    }
+    .code-input {
+      font-family: 'Fira Code', monospace;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-white min-h-screen">
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-lab-500 to-lab-600 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <span class="text-lg font-bold">API Security Lab</span>
+        </a>
+        <a href="/" class="text-gray-400 hover:text-white transition text-sm">
+          ← Back to Home
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-24 pb-12">
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+      <div class="flex items-center gap-4 mb-4">
+        <span class="text-5xl font-bold text-gray-700">{{ id }}</span>
+        <div>
+          <h1 class="text-3xl md:text-4xl font-bold">{{ challenge.name }}</h1>
+          <p class="text-gray-400">{{ challenge.description }}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="px-4 py-1 rounded-full text-sm font-bold text-white 
+          {% if challenge.severity == 'Critical' %}bg-red-600{% else %}bg-orange-600{% endif %}">
+          {{ challenge.severity }}
+        </span>
+        <a href="/" class="text-gray-500 hover:text-white transition text-sm">
+          All Challenges
+        </a>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Left Column: Explanation -->
+        <div class="space-y-6">
+          <!-- What is it? -->
+          <div class="bg-gray-900 rounded-xl p-6">
+            <h2 class="text-xl font-bold mb-4">What is it?</h2>
+            <p class="text-gray-300">{{ challenge.explanation }}</p>
+          </div>
+
+          <!-- Why vulnerable? -->
+          <div class="bg-gray-900 rounded-xl p-6">
+            <h2 class="text-xl font-bold mb-4">Why is it vulnerable?</h2>
+            <ul class="space-y-2">
+              {% for line in challenge.why_vulnerable.split('\n') %}
+              <li class="flex items-start gap-2 text-gray-300">
+                <span class="text-red-400 mt-1">•</span>
+                {{ line }}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <!-- Endpoints -->
+          <div class="bg-gray-900 rounded-xl p-6">
+            <h2 class="text-xl font-bold mb-4">Test Endpoints</h2>
+            <div class="space-y-2" id="endpoints-list">
+              {% for ep in challenge.endpoints %}
+              <button onclick="callEndpoint('{{ ep.method }}', '{{ ep.path }}')" 
+                class="endpoint-btn w-full text-left px-4 py-3 bg-gray-800 rounded-lg flex items-center gap-3">
+                <span class="px-2 py-1 rounded text-xs font-mono 
+                  {% if ep.method == 'GET' %}bg-green-600{% elif ep.method == 'POST' %}bg-blue-600{% elif ep.method == 'PUT' %}bg-yellow-600{% elif ep.method == 'PATCH' %}bg-orange-600{% elif ep.method == 'DELETE' %}bg-red-600{% endif %} text-white">
+                  {{ ep.method }}
+                </span>
+                <span class="font-mono text-sm text-gray-300">{{ ep.path }}</span>
+              </button>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Interactive Testing -->
+        <div class="space-y-6">
+          <!-- Request Builder -->
+          <div class="bg-gray-900 rounded-xl p-6">
+            <h2 class="text-xl font-bold mb-4">Make a Request</h2>
+            
+            <div class="flex gap-2 mb-4">
+              <select id="method" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="PATCH">PATCH</option>
+                <option value="DELETE">DELETE</option>
+              </select>
+              <input id="path" type="text" placeholder="/api/v1/users" 
+                class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+            </div>
+            
+            <div id="body-input" class="hidden mb-4">
+              <textarea id="body" placeholder='{"key": "value"}' rows="3"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono code-input"></textarea>
+            </div>
+            
+            <button onclick="makeRequest()" class="w-full py-3 bg-lab-600 hover:bg-lab-500 rounded-lg font-semibold transition">
+              Send Request
+            </button>
+          </div>
+
+          <!-- Response -->
+          <div class="bg-gray-900 rounded-xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-bold">Response</h2>
+              <span id="status" class="text-sm text-gray-500"></span>
+            </div>
+            <pre id="response" class="bg-gray-950 p-4 rounded-lg text-sm text-green-400 overflow-x-auto max-h-96 overflow-y-auto"></pre>
+          </div>
+
+          <!-- Quick Commands -->
+          <div class="bg-gray-900 rounded-xl p-6">
+            <h2 class="text-xl font-bold mb-4">Quick Commands</h2>
+            <div class="space-y-2 font-mono text-sm">
+              <div class="flex items-center gap-2">
+                <button onclick="copyToClipboard('curl http://localhost:5000{{ challenge.endpoints[0].path }}')" 
+                  class="text-gray-400 hover:text-white">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                </button>
+                <code class="text-green-400">curl http://localhost:5000{{ challenge.endpoints[0].path }}</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = 'http://localhost:8081';
+    
+    // FIX 1: Don't auto-send - just populate form and show helper
+    function callEndpoint(method, path) {
+      document.getElementById('method').value = method;
+      document.getElementById('path').value = path;
+      
+      const bodyInput = document.getElementById('body-input');
+      if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+        bodyInput.classList.remove('hidden');
+      } else {
+        bodyInput.classList.add('hidden');
+      }
+      
+      // Show helper for paths with placeholders like {id}
+      const responseEl = document.getElementById('response');
+      if (path.includes('{')) {
+        const placeholder = path.match(/\{[^}]+\}/)[0];
+        responseEl.textContent = '⚠️ Path contains placeholder: ' + placeholder + '\nReplace it with an actual value (e.g., 1) then click "Send Request"';
+        responseEl.classList.add('text-yellow-400');
+      } else {
+        responseEl.classList.remove('text-yellow-400');
+        responseEl.textContent = 'Form filled. Edit the path if needed, then click "Send Request"';
+      }
+      
+      // Don't auto-send - user must click "Send Request" manually
+      document.getElementById('status').textContent = 'Ready';
+    }
+    
+    async function makeRequest() {
+      const method = document.getElementById('method').value;
+      let path = document.getElementById('path').value;
+      const body = document.getElementById('body').value;
+      
+      if (!path.startsWith('/')) {
+        path = '/' + path;
+      }
+      
+      const url = API_BASE + path;
+      const statusEl = document.getElementById('status');
+      const responseEl = document.getElementById('response');
+      
+      statusEl.textContent = 'Loading...';
+      responseEl.textContent = '';
+      responseEl.classList.remove('text-yellow-400');
+      
+      try {
+        // FIX 3: Always add Content-Type header
+        const options = { 
+          method,
+          headers: { 'Content-Type': 'application/json' }
+        };
+        
+        if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+          options.body = body;
+        }
+        
+        const res = await fetch(url, options);
+        statusEl.textContent = res.status + ' ' + res.statusText;
+        
+        // FIX 5: Handle 204 No Content
+        if (res.status === 204 || res.status === 205) {
+          responseEl.textContent = '(No Content)';
+          return;
+        }
+        
+        // FIX 4: Handle non-JSON responses gracefully
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await res.json();
+          responseEl.textContent = JSON.stringify(data, null, 2);
+        } else {
+          const text = await res.text();
+          responseEl.textContent = text || '(Empty response)';
+        }
+      } catch (e) {
+        statusEl.textContent = 'Error';
+        responseEl.textContent = 'Request failed: ' + e.message + '\n\nTip: Check if the path needs a real value instead of {' + '{placeholder}' + '}';
+        responseEl.classList.add('text-red-400');
+      }
+    }
+    
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text);
+    }
+    
+    // Show body input when method changes
+    document.getElementById('method').addEventListener('change', function() {
+      const bodyInput = document.getElementById('body-input');
+      if (this.value === 'POST' || this.value === 'PUT' || this.value === 'PATCH') {
+        bodyInput.classList.remove('hidden');
+      } else {
+        bodyInput.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Security Lab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { 'sans': ['Inter', 'sans-serif'], 'mono': ['Fira Code', 'monospace'] },
+          colors: { 'lab': { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e' } }
+        }
+      }
+    }
+  </script>
+  <style>
+    .challenge-card { transition: all 0.2s ease; }
+    .challenge-card:hover { transform: translateY(-2px); }
+    .endpoint { font-family: 'Fira Code', monospace; }
+    pre { font-family: 'Fira Code', monospace; }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <!-- Navbar -->
+  <nav class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <div class="bg-lab-600 p-2 rounded-lg">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <span class="text-xl font-bold">API Security Lab</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-gray-400">6 Challenges</span>
+          <span class="px-3 py-1 bg-lab-600/20 text-lab-400 rounded-full text-sm font-mono">v1.0</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero / Landing Page -->
+  <div class="bg-gradient-to-r from-lab-900 to-gray-900 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">API Security Lab</h1>
+      <p class="text-xl text-gray-300 max-w-2xl mb-6">
+        Learn API security vulnerabilities through hands-on challenges. 
+        Each challenge includes real-world attack scenarios you can test live.
+      </p>
+      <p class="text-gray-400 mb-8">
+        <span class="text-lab-400 font-semibold">6 Vulnerabilities</span> • 
+        <span class="text-green-400 font-semibold">Open Access</span> • 
+        <span class="text-yellow-400 font-semibold">Interactive Testing</span>
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#challenges" class="px-6 py-3 bg-lab-600 hover:bg-lab-500 rounded-lg font-semibold transition">
+          Start Learning
+        </a>
+        <a href="#about" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition">
+          How It Works
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <section id="about" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-800">
+    <h2 class="text-2xl font-bold mb-6">How It Works</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-gray-900 p-6 rounded-lg">
+        <div class="text-lab-500 text-xl font-bold mb-2">1</div>
+        <h3 class="font-bold mb-2">Choose a Vulnerability</h3>
+        <p class="text-gray-400 text-sm">Select one of the 6 API security challenges from the tabs above.</p>
+      </div>
+      <div class="bg-gray-900 p-6 rounded-lg">
+        <div class="text-lab-500 text-xl font-bold mb-2">2</div>
+        <h3 class="font-bold mb-2">Test the Endpoints</h3>
+        <p class="text-gray-400 text-sm">Click any endpoint to make a live API call and see the vulnerability in action.</p>
+      </div>
+      <div class="bg-gray-900 p-6 rounded-lg">
+        <div class="text-lab-500 text-xl font-bold mb-2">3</div>
+        <h3 class="font-bold mb-2">Learn & Exploit</h3>
+        <p class="text-gray-400 text-sm">Understand why it happens and try the attack examples provided.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Challenge Tabs -->
+  <div id="challenges" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex flex-wrap gap-2" id="challengeTabs">
+      <button onclick="showChallenge(1)" class="tab-btn px-4 py-2 bg-red-600 rounded-lg font-semibold" data-challenge="1">1. BOLA</button>
+      <button onclick="showChallenge(2)" class="tab-btn px-4 py-2 bg-gray-700 rounded-lg font-semibold" data-challenge="2">2. Auth</button>
+      <button onclick="showChallenge(3)" class="tab-btn px-4 py-2 bg-gray-700 rounded-lg font-semibold" data-challenge="3">3. Property Auth</button>
+      <button onclick="showChallenge(4)" class="tab-btn px-4 py-2 bg-gray-700 rounded-lg font-semibold" data-challenge="4">4. Resource</button>
+      <button onclick="showChallenge(5)" class="tab-btn px-4 py-2 bg-gray-700 rounded-lg font-semibold" data-challenge="5">5. SSRF</button>
+      <button onclick="showChallenge(6)" class="tab-btn px-4 py-2 bg-gray-700 rounded-lg font-semibold" data-challenge="6">6. SQLi</button>
+    </div>
+  </div>
+
+  <!-- Challenge Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Challenge 1: BOLA -->
+    <div id="challenge-1" class="challenge-content">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">Broken Object Level Authorization (BOLA/IDOR)</h2>
+        <p class="text-gray-400">APIs expose endpoints that handle object identifiers without verifying ownership. Any user can access anyone else's data by changing the ID.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Test Endpoints</h3>
+          <div class="space-y-3">
+            <button onclick="callAPI('GET', '/api/v1/users')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/users</button>
+            <button onclick="callAPI('GET', '/api/v1/users/1')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/users/{id}</button>
+            <button onclick="callAPI('GET', '/api/v1/items')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/items</button>
+            <button onclick="callAPI('GET', '/api/v1/items/1')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/items/{id}</button>
+            <button onclick="callAPI('GET', '/api/v1/secrets')" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/secrets ⚠️</button>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Why It's Vulnerable</h3>
+          <ul class="text-gray-300 space-y-2 text-sm">
+            <li>• No authentication required</li>
+            <li>• No ownership check on resource access</li>
+            <li>• Trusting user-provided IDs</li>
+          </ul>
+          <h3 class="font-bold mt-6 mb-4">Attack Example</h3>
+          <pre class="bg-gray-900 p-3 rounded-lg text-sm text-green-400 overflow-x-auto">curl http://localhost:5000/api/v1/users/2</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge 2: Auth -->
+    <div id="challenge-2" class="challenge-content hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">Broken Authentication</h2>
+        <p class="text-gray-400">Flawed login mechanisms allowing account takeover, brute force, and session manipulation.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Test Endpoints</h3>
+          <div class="space-y-3">
+            <button onclick="postLogin()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">POST /api/v2/login</button>
+            <button onclick="postRegister()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">POST /api/v2/register</button>
+            <button onclick="postReset()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">POST /api/v2/reset-password ⚠️</button>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Why It's Vulnerable</h3>
+          <ul class="text-gray-300 space-y-2 text-sm">
+            <li>• No rate limiting</li>
+            <li>• No account lockout</li>
+            <li>• No verification on password reset</li>
+          </ul>
+          <h3 class="font-bold mt-6 mb-4">Attack Example</h3>
+          <pre class="bg-gray-900 p-3 rounded-lg text-sm text-green-400 overflow-x-auto">Try: admin / admin123</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge 3: Property Auth -->
+    <div id="challenge-3" class="challenge-content hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">Broken Object Property Level Authorization</h2>
+        <p class="text-gray-400">Excessive data exposure + mass assignment - returns all fields including sensitive data.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Test Endpoints</h3>
+          <div class="space-y-3">
+            <button onclick="callAPI('GET', '/api/v3/users')" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v3/users ⚠️</button>
+            <button onclick="callAPI('GET', '/api/v3/users/1')" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v3/users/{id} ⚠️</button>
+            <button onclick="updateUser()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">PUT /api/v3/users/{id}</button>
+            <button onclick="updateItem()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">PATCH /api/v3/items/{id}</button>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Why It's Vulnerable</h3>
+          <ul class="text-gray-300 space-y-2 text-sm">
+            <li>• Returns all fields including password</li>
+            <li>• Allows modifying role, is_admin</li>
+            <li>• No field allowlist</li>
+          </ul>
+          <h3 class="font-bold mt-6 mb-4">Attack Example</h3>
+          <pre class="bg-gray-900 p-3 rounded-lg text-sm text-green-400 overflow-x-auto">Try fetching users - password exposed!</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge 4: Resource -->
+    <div id="challenge-4" class="challenge-content hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">Unrestricted Resource Consumption</h2>
+        <p class="text-gray-400">No rate limiting allowing DoS attacks and cost escalation.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Test Endpoints</h3>
+          <div class="space-y-3">
+            <button onclick="callAPI('GET', '/api/v4/search?q=laptop')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v4/search</button>
+            <button onclick="callAPI('GET', '/api/v4/export')" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v4/export ⚠️</button>
+            <button onclick="bulkAction()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">POST /api/v4/bulk-action</button>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Why It's Vulnerable</h3>
+          <ul class="text-gray-300 space-y-2 text-sm">
+            <li>• No pagination</li>
+            <li>• No rate limiting</li>
+            <li>• Unlimited exports</li>
+          </ul>
+          <h3 class="font-bold mt-6 mb-4">Attack Example</h3>
+          <pre class="bg-gray-900 p-3 rounded-lg text-sm text-green-400 overflow-x-auto">Export entire database!</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge 5: SSRF -->
+    <div id="challenge-5" class="challenge-content hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">Server-Side Request Forgery (SSRF)</h2>
+        <p class="text-gray-400">API fetches user-controlled URLs without validation enabling internal network attacks.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Test Endpoints</h3>
+          <div class="space-y-3">
+            <button onclick="fetchURL()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">POST /api/v5/fetch ⚠️</button>
+            <button onclick="proxyURL()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v5/proxy ⚠️</button>
+            <button onclick="webhookURL()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">POST /api/v5/webhook</button>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Why It's Vulnerable</h3>
+          <ul class="text-gray-300 space-y-2 text-sm">
+            <li>• No URL validation</li>
+            <li>• Can access internal network</li>
+            <li>• Cloud metadata exposure</li>
+          </ul>
+          <h3 class="font-bold mt-6 mb-4">Attack Targets</h3>
+          <pre class="bg-gray-900 p-3 rounded-lg text-sm text-green-400 overflow-x-auto">http://169.254.169.254/
+http://localhost/
+http://127.0.0.1:5432/</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge 6: SQLi -->
+    <div id="challenge-6" class="challenge-content hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">SQL Injection</h2>
+        <p class="text-gray-400">Direct string concatenation in SQL queries allowing data extraction.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Test Endpoints</h3>
+          <div class="space-y-3">
+            <button onclick="sqlSearch()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v6/search?q=... ⚠️</button>
+            <button onclick="sqlCustomers()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v6/customers ⚠️</button>
+            <button onclick="sqlLogin()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">POST /api/v6/login ⚠️</button>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="font-bold mb-4">Why It's Vulnerable</h3>
+          <ul class="text-gray-300 space-y-2 text-sm">
+            <li>• Direct string concatenation</li>
+            <li>• No parameterized queries</li>
+            <li>• No input sanitization</li>
+          </ul>
+          <h3 class="font-bold mt-6 mb-4">Attack Payloads</h3>
+          <pre class="bg-gray-900 p-3 rounded-lg text-sm text-green-400 overflow-x-auto">' OR '1'='1
+admin' --
+UNION SELECT * FROM users--</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Response Area -->
+    <div class="mt-6">
+      <h3 class="font-bold mb-4">Response</h3>
+      <pre id="response" class="bg-gray-950 p-4 rounded-lg text-sm text-green-400 overflow-x-auto max-h-96">Click an endpoint to test...</pre>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 border-t border-gray-700 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center text-gray-400">
+      <p>API Security Lab - Educational Platform</p>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = 'http://localhost:5000';
+
+    function showChallenge(num) {
+      document.querySelectorAll('.challenge-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('challenge-' + num).classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-red-600');
+        btn.classList.add('bg-gray-700');
+        if (parseInt(btn.dataset.challenge) === num) {
+          btn.classList.remove('bg-gray-700');
+          btn.classList.add('bg-red-600');
+        }
+      });
+    }
+
+    async function callAPI(method, path) {
+      const url = API_BASE + path;
+      try {
+        const res = await fetch(url, { method });
+        const data = await res.json();
+        document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        document.getElementById('response').textContent = 'Error: ' + e.message;
+      }
+    }
+
+    async function postLogin() {
+      const body = { username: 'admin', password: 'admin123' };
+      const res = await fetch(API_BASE + '/api/v2/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function postRegister() {
+      const body = { username: 'attacker', password: 'hacked123', email: 'attacker@evil.com' };
+      const res = await fetch(API_BASE + '/api/v2/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function postReset() {
+      const body = { username: 'admin', new_password: 'hacked' };
+      const res = await fetch(API_BASE + '/api/v2/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function updateUser() {
+      const body = { role: 'admin', password: 'changed' };
+      const res = await fetch(API_BASE + '/api/v3/users/2', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function updateItem() {
+      const body = { price: 0 };
+      const res = await fetch(API_BASE + '/api/v3/items/1', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function bulkAction() {
+      const body = { action: 'update_price', item_ids: [1,2,3], price: 1 };
+      const res = await fetch(API_BASE + '/api/v4/bulk-action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function fetchURL() {
+      const body = { url: 'http://169.254.169.254/latest/meta-data/' };
+      const res = await fetch(API_BASE + '/api/v5/fetch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function proxyURL() {
+      callAPI('GET', '/api/v5/proxy?url=http://localhost/');
+    }
+
+    async function webhookURL() {
+      const body = { webhook_url: 'http://internal-server/webhook' };
+      const res = await fetch(API_BASE + '/api/v5/webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function sqlSearch() {
+      callAPI('GET', '/api/v6/search?q=%27%20OR%20%271%27%3D%271');
+    }
+
+    async function sqlCustomers() {
+      callAPI('GET', '/api/v6/customers?sort=id%20DESC%3B%20DROP%20TABLE%20users--');
+    }
+
+    async function sqlLogin() {
+      const body = { username: "admin' --", password: 'anything' };
+      const res = await fetch(API_BASE + '/api/v6/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
