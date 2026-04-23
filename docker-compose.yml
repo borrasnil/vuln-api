@@ -6,8 +6,8 @@ services:
     container_name: api_lab_db
     environment:
       POSTGRES_DB: api_lab
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: api_user
+      POSTGRES_PASSWORD: api_pass
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -15,7 +15,7 @@ services:
     networks:
       - api-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d api_lab"]
+      test: ["CMD-SHELL", "pg_isready -U api_user -d api_lab"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,7 +28,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/api_lab
+      DATABASE_URL: postgresql://api_user:api_pass@postgres:5432/api_lab
       FLASK_ENV: development
       SECRET_KEY: FLASK_SECURE_KEY_DONT_RUN_IN_EXPOSED_NETWORK_YOU_WILL_GET_HACKED
 
