@@ -10,3 +10,17 @@ cd vuln-api
 docker compose up --build
 ```
 
+## Docker compose scheme
+!! This project is only meant to run in a safe local network, database password and Flask key are hardcoded into `docker-compose.yml` !!
+
+- Custom bridge network
+
+- Database container
+  · PostgreSQL 15
+
+- Backend container
+  · Flask API
+
+- Frontend container
+  · nginx reverse proxy 
+  · Tailwind CSS
