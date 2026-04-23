@@ -6,8 +6,8 @@ services:
     container_name: api_lab_db
     environment:
       POSTGRES_DB: api_lab
-      POSTGRES_USER: api_user
-      POSTGRES_PASSWORD: api_pass
+      POSTGRES_USER: postgres1234
+      POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -30,7 +30,7 @@ services:
     environment:
       DATABASE_URL: postgresql://api_user:api_pass@postgres:5432/api_lab
       FLASK_ENV: development
-      SECRET_KEY: 
+      SECRET_KEY: FLASK_SECURE_KEY_DONT_RUN_IN_EXPOSED_NETWORK_YOU_WILL_GET_HACKED
 
     depends_on:
       postgres:
