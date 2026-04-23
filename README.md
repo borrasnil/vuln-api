@@ -12,15 +12,8 @@ docker compose up --build
 
 ## Docker compose scheme
 !! This project is only meant to run in a safe local network, database password and Flask key are hardcoded into `docker-compose.yml` !!
-
-- Custom bridge network
-
-- Database container
-  · PostgreSQL 15
-
-- Backend container
-  · Flask API
-
-- Frontend container
-  · nginx reverse proxy 
-  · Tailwind CSS
+1. PostgreSQL container starts and initializes
+2. Health check monitors PostgreSQL readiness
+3. Flask API waits for PostgreSQL to be healthy, then starts
+4. Nginx starts after Flask API is running
+5. Application is fully operational
