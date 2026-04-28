@@ -1,0 +1,15 @@
+.challenge-card {
+  transition: all 0.2s ease;
+}
+
+.challenge-card:hover {
+  transform: translateY(-2px);
+}
+
+.endpoint {
+  font-family: 'Fira Code', monospace;
+}
+
+pre, code {
+  font-family: 'Fira Code', monospace;
+}
